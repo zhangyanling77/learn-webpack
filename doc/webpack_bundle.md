@@ -1,6 +1,10 @@
 # webpack 打包文件分析
 
-## 前言
+## webpack简介
+`Webpack` 是一个用于静态资源打包的工具。它分析你的项目结构，会递归的构建依赖关系，找到其中脚本、图片、样式等将其转换和打包输出为浏览器能识别的资源。
+![](../assets/webpack.png)
+
+## 项目准备
 
 ## 打包文件分析
 
@@ -88,7 +92,7 @@
   // 该属性用于存放公共访问路径，默认为'' (__webpack_public_path__)
   __webpack_require__.p = "";
 
-  // 架子啊入口模块并返回模块的导出对象
+  // 加载入口模块并返回模块的导出对象
   return __webpack_require__(__webpack_require__.s = "./src/index.js");
 })
 ({
