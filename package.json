@@ -1,0 +1,26 @@
+{
+  "name": "learn-webpack",
+  "version": "1.0.0",
+  "description": "学习webpack的记录，版本4.x",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhangyanling77/learn-webpack.git"
+  },
+  "keywords": [
+    "webpack"
+  ],
+  "author": "zhangyanling77",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zhangyanling77/learn-webpack/issues"
+  },
+  "homepage": "https://github.com/zhangyanling77/learn-webpack#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
