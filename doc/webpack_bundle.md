@@ -2,12 +2,41 @@
 
 ## webpack简介
 `Webpack` 是一个用于静态资源打包的工具。它分析你的项目结构，会递归的构建依赖关系，找到其中脚本、图片、样式等将其转换和打包输出为浏览器能识别的资源。
-![webpack](https://github.com/zhangyanling77/learn-webpack/blob/master/webpack.png)
+
+![](https://github.com/zhangyanling77/learn-webpack/blob/master/webpack.png)
 
 ## 项目准备
+[项目地址](https://github.com/zhangyanling77/learn-webpack)
 
+下面列一下关键文件：
+
+- src/index.js
+```javascript
+import foo from './foo.js';
+
+console.log(foo)
+```
+- src/foo.js
+```javascript
+const foo = 'foo';
+export default foo;
+```
+- webpack.config.js
+```javascript
+const path = require('path');
+
+module.exports = {
+  mode: 'development', // 标识不同的环境，development 开发 | production 生产
+  devtool: 'none', // 不生成 sourcemap 文件
+  entry: './src/index.js', // 文件入口
+  output:  {
+    path: path.resolve(__dirname, 'dist'), // 输出目录
+    filename: 'bundle.js', // 输出文件名称
+  }
+}
+```
 ## 打包文件分析
-
+- dist/bundle.js
 ```javascript
  (function(modules) {
   // 模块缓存对象
