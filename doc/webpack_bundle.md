@@ -17,7 +17,7 @@ import foo from './foo.js';
 
 console.log(foo)
 ```
-- chunkFile：src/foo.js
+- 依赖文件：src/foo.js
 ```javascript
 const foo = 'foo';
 export default foo;
@@ -72,6 +72,6 @@ module.exports = {
 });
 ```
 
-根据上面的文件可以看出，最终打包出的是一个自执行函数。
-首先，这个自执行函数它接收一个参数`modules`，`modules`为一个对象，其中`key`为打包的模块文件的路径，对应的`value`为一个函数，其内部为模块文件定义的内容。
-然后，我们再来看一看自执行函数的函数体部分。
+根据上面的文件可以看出，最终打包出的是一个自执行函数。<br>
+首先，这个自执行函数它接收一个参数`modules`，`modules`为一个对象，其中`key`为打包的模块文件的路径，对应的`value`为一个函数，其内部为模块文件定义的内容。<br>
+然后，我们再来看一看自执行函数的函数体部分。<br>
