@@ -123,7 +123,7 @@ module.exports = {
 首先，这个自执行函数它接收一个参数`modules`，`modules`为一个对象，其中`key`为打包的模块文件的路径，对应的`value`为一个函数，其内部为模块文件定义的内容。<br>
 然后，我们再来看一看自执行函数的函数体部分。函数体返回 `__webpack_require__(__webpack_require__.s = "./src/index.js")` 这段代码，此处为加载入口模块并返回模块的导出对象。<br>
 可以发现，webpack自己实现了一套加载机制，即`__webpack_require__`，可以在浏览器中使用。该方法接收一个moduleId，返回当前模块的导出对象。
-### webpack文件加载（__webpack_require__ ）
+### webpack文件加载（ __webpack_require__  ）
 ```javascript
   var installedModules = {};
   function __webpack_require__(moduleId) {
@@ -165,7 +165,7 @@ module.exports = {
 
 那么，到此为止，我们已经明白了webpack加载模块的基本原理。但细心的你一定发现了，我们的文件导入导出遵循的是commonjs规范，而webpack是基于nodejs实现的，所以在文件加载部分并没有特别的处理。因此，这里我们来看看不同模块规范相互加载时，webpack是如何处理的。
 
-** harmony（和谐，即对于不同模块规范加载的一个兼容处理）**
+**harmony（和谐，即对于不同模块规范加载的一个兼容处理）**
 
 - commonjs 加载 commonjs
 这种方式即我们上面示例的加载方式，就不做赘述了。
@@ -196,7 +196,7 @@ dist/bundle.js
 })
 ```
 
-由打包后的源码可以发现，当`foo.js`使用es6 module方式导出，与之前的相比，多了`__webpack_require__.r(__webpack_exports__)`这段代码，** __webpack_exports__ ** 很好理解，即模块的导出对象。那么，** __webpack_require__.r **方法是干嘛的呢？
+由打包后的源码可以发现，当`foo.js`使用es6 module方式导出，与之前的相比，多了`__webpack_require__.r(__webpack_exports__)`这段代码，`__webpack_exports__`很好理解，即模块的导出对象。那么，`__webpack_require__.r`方法是干嘛的呢？
 ```javascript
 // ...
 __webpack_require__.r = function(exports) {
