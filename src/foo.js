@@ -1,2 +1,4 @@
-const foo = 'foo';
-export default foo;
+
+// export default 'foo';
+
+module.exports = 'foo';
