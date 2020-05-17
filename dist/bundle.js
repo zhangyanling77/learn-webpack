@@ -19,6 +19,7 @@
 
     // 标识该模块赢加载
     module.l = true;
+    console.log(module)
 
     // 返回该模块的导出对象
     return module.exports;

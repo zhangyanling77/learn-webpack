@@ -37,24 +37,129 @@ module.exports = {
 }
 ```
 ## bundle分析
-首先放上打包输出文件：dist/bundle.js，这里先隐藏一些细节，稍后再详细分析。
+首先放上打包输出文件：dist/bundle.js
 
 ```javascript
  (function(modules) {
   // 模块缓存对象
   var installedModules = {};
   function __webpack_require__(moduleId) {
-    // ... 执行一些操作
+    if(installedModules[moduleId]) {
+      return installedModules[moduleId].exports;
+    }
+    // 创建一个新的模块对象
+    var module = installedModules[moduleId] = {
+      i: moduleId, // 模块id，即模块所在的路径
+      l: false, // 该模块是否已经加载过了
+      exports: {} // 导出对象
+    };
+
+    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+    module.l = true;
     // 返回该模块的导出对象
     return module.exports;
   }
-
-  // ... 执行一些操作
-
+  // 该属性用于公开modules对象 (__webpack_modules__)
+  __webpack_require__.m = modules;
+  // 该属性用于公开模块缓存对象
+  __webpack_require__.c = installedModules;
+  // 该属性用于定义兼容各种模块规范输出的getter函数，d即Object.defineProperty
+  __webpack_require__.d = function(exports, name, getter) {
+    if(!__webpack_require__.o(exports, name)) {
+      Object.defineProperty(exports, name, { enumerable: true, get: getter });
+    }
+  };
+  // 该属性用于在导出对象exports上定义 __esModule = true，表示该模块是一个es6模块
+  __webpack_require__.r = function(exports) {
+    // 定义这种模块的Symbol.toStringTag为 [object Module]
+    if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+      Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+    }
+    Object.defineProperty(exports, '__esModule', { value: true });
+  };
+  // 创建一个命名空间对象
+  // mode & 1: 传入的value为模块id，使用__webpack_require__加载该模块
+  // mode & 2: 将传入的value的所有的属性都合并到ns对象上
+  // mode & 4: 当ns对象已经存在时，直接返回value。表示该模块已经被包装过了
+  // mode & 8|1: 行为类似于require
+  __webpack_require__.t = function(value, mode) {
+    if(mode & 1) value = __webpack_require__(value);
+    if(mode & 8) return value;
+    if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+    // 创建一个命名空间对象
+    var ns = Object.create(null);
+    // 将ns对象标识为es模块
+    __webpack_require__.r(ns);
+    // 给ns对象定义default属性，值为传入的value
+    Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+    if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+    return ns;
+  };
+  // 获取模块的默认导出对象，这里区分 commonjs 和 es modlue两种方式
+  __webpack_require__.n = function(module) {
+    var getter = module && module.__esModule ?
+      function getDefault() { return module['default']; } :
+      function getModuleExports() { return module; };
+    __webpack_require__.d(getter, 'a', getter);
+    return getter;
+  };
+  // 该属性用于判断对象自身属性中是否具有指定的属性，o即Object.prototype.hasOwnProperty
+  __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+  // 该属性用于存放公共访问路径，默认为'' (__webpack_public_path__)
+  __webpack_require__.p = "";
   // 加载入口模块并返回模块的导出对象
   return __webpack_require__(__webpack_require__.s = "./src/index.js");
 })
 ({
+  "./src/foo.js":
+  (function(module, __webpack_exports__, __webpack_require__) {
+    __webpack_require__.r(__webpack_exports__);
+    const foo = 'foo';
+    __webpack_exports__["default"] = (foo);
+  }),
+  "./src/index.js":
+  (function(module, __webpack_exports__, __webpack_require__) {
+    __webpack_require__.r(__webpack_exports__);
+    console.log(_foo_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+  })
+});
+```
+
+根据上面的源码可以看出，最终打包出的是一个自执行函数。<br>
+首先，这个自执行函数它接收一个参数`modules`，`modules`为一个对象，其中`key`为打包的模块文件的路径，对应的`value`为一个函数，其内部为模块文件定义的内容。<br>
+然后，我们再来看一看自执行函数的函数体部分。函数体返回 `__webpack_require__(__webpack_require__.s = "./src/index.js")` 这段代码，此处为加载入口模块并返回模块的导出对象。<br>
+可以发现，webpack自己实现了一套加载机制，即`__webpack_require__`，可以在浏览器中使用。该方法接收一个moduleId，返回当前模块的导出对象。让我们来看看内部的实现。
+```javascript
+  // 模块缓存对象
+  var installedModules = {};
+  function __webpack_require__(moduleId) {
+    if(installedModules[moduleId]) {
+      return installedModules[moduleId].exports;
+    }
+    // 创建一个新的模块对象
+    var module = installedModules[moduleId] = {
+      i: moduleId, // 模块id，即模块所在的路径
+      l: false, // 该模块是否已经加载过了
+      exports: {} // 导出对象
+    };
+
+    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+    module.l = true;
+
+    return module.exports;
+  }
+```
+首先，当前作用域顶端声明了`installedModules`这个对象，它用于缓存加载过的模块。在`__webpack_require__`方法内部，会对于传入的moduleId在缓存对象中查找对应的模块是否存在，如果已经存在，返回该模块对象的导出对象；否则，创建一个新的模块对象，记录当前模块id、标识模块是否加载过、以及定义导出对象，同时将它放到缓存对象中。<br>
+接下来就是重要的一步，执行模块的函数内容，传入module、module.exports及__webpack_require__作为参数。
+```javascript
+ modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+```
+也就是去执行自执行函数传入的modules对象中当前moduleId对应的函数。接着将该模块标识为已经加载的状态，最后返回当前模块的导出对象。此时便完成了模块的加载任务。<br>
+接着，再来看看传入的modules对象部分。
+```javascript
+ (...)({
   "./src/foo.js":
   (function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
@@ -68,40 +173,17 @@ module.exports = {
     __webpack_require__.r(__webpack_exports__);
     console.log(_foo_js__WEBPACK_IMPORTED_MODULE_0__["default"])
   })
-});
 ```
-
-根据上面的源码可以看出，最终打包出的是一个自执行函数。<br>
-首先，这个自执行函数它接收一个参数`modules`，`modules`为一个对象，其中`key`为打包的模块文件的路径，对应的`value`为一个函数，其内部为模块文件定义的内容。<br>
-然后，我们再来看一看自执行函数的函数体部分。函数体返回 `__webpack_require__(__webpack_require__.s = "./src/index.js")` 这段代码，此处为加载入口模块并返回模块的导出对象。
-可以发现，webpack自己实现了一套加载机制，即`__webpack_require__`，可以在浏览器中使用。该方法接收一个moduleId，返回加载的模块的导出对象。让我们来看看内部的实现。
+观察函数体内容，可以看到`__webpack_require__.r(__webpack_exports__)`这段代码，**__webpack_exports__** 很好理解，即模块的导出对象。那么，**__webpack_require__.r**方法是干嘛的呢？
 ```javascript
-  // 模块缓存对象
-  var installedModules = {};
-  function __webpack_require__(moduleId) {
-    if(installedModules[moduleId]) {
-      return installedModules[moduleId].exports;
-    }
-    // 创建一个新的模块对象，并将它放到缓存中
-    var module = installedModules[moduleId] = {
-      i: moduleId, // 模块id，即模块所在的路径
-      l: false, // 该模块是否已经加载过了
-      exports: {} // 导出对象
-    };
-
-    // 执行当前传入的模块id对应的函数
-    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-    // 标识该模块赢加载
-    module.l = true;
-
-    // 返回该模块的导出对象
-    return module.exports;
+__webpack_require__.r = function(exports) {
+  if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+    Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
   }
+  Object.defineProperty(exports, '__esModule', { value: true });
+};
 ```
-首先，当前作用域顶端声明了`installedModules`这个对象，它用于缓存加载过的模块。在__webpack_require__方法内部，会对于传入的模块在缓存对象中进行检查，如果已经存在，返回该模块对象的导出对象；否则，创建一个新的模块对象，记录模块id、标识模块是否加载过、以及定义导出对象，同时将它放到缓存中。<br>
-接下来就是重要的一步，执行模块的函数内容。
-```javascript
- modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-```
-也就是自执行函数传入的modules对象中当前moduleId对应的函数内容。
+根据源码可知，该方法将传入的对象标识上`__esModule=true`，即表明该模块为es6模块。同时定义该对象的`Symbol.toStringTag`为`Module`，即当使用`Object.prototype.toString.call`时将返回`[object Module]`。<br>
+然后，将模块的内容挂在`__webpack_exports__`的`default`属性上。
+
+当然，打包出的源码中，还有一些的方法，如 ` __webpack_require__.m`，` __webpack_require__.c`等，可通过注释了解其作用。
