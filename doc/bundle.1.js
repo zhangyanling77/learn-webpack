@@ -48,9 +48,9 @@
  
   // 创建一个假的命名空间对象
   // mode & 1: 传入的value为模块id，使用__webpack_require__加载该模块
-  // mode & 2: 将传入的value的所有的属性都拷贝定义到ns对象上
+  // mode & 2: 将传入的value的所有的属性都合并到ns对象上
   // mode & 4: 当ns对象已经存在时，直接返回value。表示该模块已经被包装过了
-  // mode & 8|1: 已经加载好直接返回就好了
+  // mode & 8|1: 行为类似于require
   __webpack_require__.t = function(value, mode) {
     if(mode & 1) value = __webpack_require__(value);
     if(mode & 8) return value;
