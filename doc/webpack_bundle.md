@@ -168,9 +168,11 @@ module.exports = {
 **harmony（和谐，即对于不同模块规范加载的一个兼容处理）**
 
 - commonjs 加载 commonjs
+
 这种方式即我们上面示例的加载方式，就不做赘述了。
 
 - commonjs 加载 es module
+
 src/foo.js
 ```javascript
 export default 'foo';
@@ -196,7 +198,7 @@ dist/bundle.js
 })
 ```
 
-由打包后的源码可以发现，当`foo.js`使用es6 module方式导出，与之前的相比，多了`__webpack_require__.r(__webpack_exports__)`这段代码，`__webpack_exports__`很好理解，即模块的导出对象。那么，`__webpack_require__.r`方法是干嘛的呢？
+由打包后的源码可以发现，当`foo.js`使用es module方式导出，与之前的相比，多了`__webpack_require__.r(__webpack_exports__)`这段代码，`__webpack_exports__`很好理解，即模块的导出对象。那么，`__webpack_require__.r`方法是干嘛的呢？
 ```javascript
 // ...
 __webpack_require__.r = function(exports) {
@@ -208,9 +210,10 @@ __webpack_require__.r = function(exports) {
 // ...
 ```
 根据其实现可知，该方法将传入的对象标识上`__esModule=true`，即表明该模块为es6模块。同时定义该对象的`Symbol.toStringTag`为`Module`，即当使用`Object.prototype.toString.call`时将返回`[object Module]`。<br>
-然后，将模块的内容挂在`__webpack_exports__`的`default`属性上。
+最后，将模块的内容挂在`__webpack_exports__`的`default`属性上。
 
 - es module 加载 es module
+
 src/foo.js
 ```javascript
 export default 'foo';
@@ -263,6 +266,7 @@ __webpack_require__.o = function(object, property) { return Object.prototype.has
 分析这几个方法可以发现，`__webpack_require__.o`其实就是`Object.prototype.hasOwnProperty`的一个重写，用于判断对象自身属性中是否具有指定的属性。而`__webpack_require__.d`即`Object.defineProperty`，这里用于定义兼容各种模块规范输出的getter函数。`__webpack_require__.n`则是用于获取模块的默认导出对象，兼容commonjs 和 es modlue两种方式。
 
 - es module 加载 commonjs
+
 src/foo.js
 ```javascript
 module.exports = 'foo';
@@ -288,7 +292,7 @@ dist/bundle.js
   })
 })
 ```
-当入口文件`index.js`文件以es module的方式加载遵循commonjs规范的`foo.js`时，通过`__webpack_require__`加载传入的模块，将得到的模块`_foo_js__WEBPACK_IMPORTED_MODULE_0__`再传入`__webpack_require__.n`方法获取到该模块的默认导出对象。因为`foo.js`中的内容是通过**export**导出，而非**export default**导出。因此`foo`被挂在了`default`的一个`a`属性上。
+当入口文件`index.js`以es module的方式加载遵循commonjs规范的`foo.js`时，通过`__webpack_require__`加载传入的模块，将得到的模块`_foo_js__WEBPACK_IMPORTED_MODULE_0__`再传入`__webpack_require__.n`方法获取到该模块的默认导出对象。因为`foo.js`中的内容是通过**export**导出，而非**export default**导出。因此`foo`被挂在了`default`的一个`a`属性上。
 
 webpack对于不同模块规范的相互加载的处理，我们已经有了基本的了解。但此时我们的文件加载都是同步的，那么文件的异步加载又是怎么样的呢？
 
