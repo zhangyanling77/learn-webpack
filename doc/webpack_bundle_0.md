@@ -1,6 +1,7 @@
 # webpack 打包文件分析（上）
 
 ## 前言
+
 ![webpack](https://github.com/zhangyanling77/learn-webpack/blob/master/webpack.png)
 
 `Webpack` 是一个用于静态资源打包的工具。它分析你的项目结构，会递归的构建依赖关系，找到其中脚本、图片、样式等将其转换和打包输出为浏览器能识别的资源。
