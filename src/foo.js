@@ -1,4 +1,4 @@
 
-// export default 'foo';
+export default 'foo';
 
-module.exports = 'foo';
+// module.exports = 'foo';
