@@ -26,7 +26,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*'] }),
     new HtmlWebpackPlugin({
-      template: './src/index.html',
+      template: './public/index.html',
       filename: 'index.html',
       // chunks: ['main1']
     })
