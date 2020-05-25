@@ -8,4 +8,9 @@
 
 其次，这个打包出来的`bundle.js`中其实部分的代码资源是当前加载页面用不到的，这样也导致了浪费。于是，资源加载的优化就成了必须要考虑的问题，而异步加载（或者说动态加载）就是解决这个问题的方案之一。
 
+## 异步加载
+
 在`webpack`中提供了符合[ECMAScript](https://tc39.github.io/proposal-dynamic-import/)的`import()`，允许我们动态的加载模块。（在`webpavk`版本较低时，我们使用的代码动态加载方案是`require.ensure`方法，后面已经被`import`取代）。
+
+
+## 结语
