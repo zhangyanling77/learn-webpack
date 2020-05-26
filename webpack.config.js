@@ -24,11 +24,15 @@ module.exports = {
   },
   module: {},
   plugins: [
+    /**
+     * 这个参数配置要删除哪些文件，和不要删除哪些文件，不要删除的文件前面加个逻辑运算符非 ! ，*号可以通过占位符来处理，表示什么开头，什么结尾
+     * 比如：
+     * cleanOnceBeforeBuildPatterns: ['main*.*', '!vendor', '!vendor.manifest.json']
+     */
     new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*'] }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      filename: 'index.html',
-      // chunks: ['main1']
+      filename: 'index.html'
     })
   ],
   devServer: {}
