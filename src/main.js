@@ -1,3 +1,3 @@
-import (/* webpackName: "foo" */ './foo').then(foo => {
+import (/* webpackChunkName: "foo" */ './foo').then(foo => {
   console.log(foo)
 })
