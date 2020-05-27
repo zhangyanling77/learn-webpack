@@ -20,7 +20,7 @@ module.exports = {
   entry: './src/main.js', // 文件入口
   output:  {
     path: path.resolve(__dirname, 'dist'), // 输出目录
-    filename: '[name].js', // 输出文件名称
+    filename: '[name].bundle.js', // 输出文件名称
   },
   module: {},
   plugins: [
