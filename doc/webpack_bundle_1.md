@@ -49,84 +49,83 @@ import (/* webpackChunkName: "foo" */ './foo').then(foo => {
 
 ```javascript
 (function(modules) {
-	// install a JSONP callback for chunk loading
+
 	function webpackJsonpCallback(data) {
-		var chunkIds = data[0];
-		var moreModules = data[1];
-		// add "moreModules" to the modules object,
-		// then flag all "chunkIds" as loaded and fire callback
+		var chunkIds = data[0]; // 对应加载的chunk的名称
+		var moreModules = data[1]; // 对应加载的chunk组成的对象
+    // 将 "moreModules" 添加到 modules 对象中，然后将所有的 chunkIds 标记为已加载，并触发回调
 		var moduleId, chunkId, i = 0, resolves = [];
 		for(;i < chunkIds.length; i++) {
 			chunkId = chunkIds[i];
 			if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
 				resolves.push(installedChunks[chunkId][0]);
 			}
-			installedChunks[chunkId] = 0;
+			installedChunks[chunkId] = 0; // 标识chunk加载完毕
 		}
 		for(moduleId in moreModules) {
 			if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
-				modules[moduleId] = moreModules[moduleId];
+				modules[moduleId] = moreModules[moduleId]; // 将传入的chunk对应的文件定义内容放入 modules 中
 			}
-		}
+    }
+
 		if(parentJsonpFunction) parentJsonpFunction(data);
 
 		while(resolves.length) {
-			resolves.shift()();
+			resolves.shift()(); // 将所有的promise变为成功态，依次执行resolve
 		}
 	};
 
-	// The module cache
-	var installedModules = {};
-
-	// object to store loaded and loading chunks
-	// undefined = chunk not loaded, null = chunk preloaded/prefetched
-	// Promise = chunk loading, 0 = chunk loaded
+  /** 
+   * 该对象用于存储已经加载和正在加载中的chunks
+   * undefined：表示chunk未加载
+   * null：表示chunk预加载 / 预获取
+   * Promise：表示chunk正在加载中
+   * 0: 表示chunk已经加载了
+  */
 	var installedChunks = {
 		"index": 0
 	};
 
-	// script path function
+	// 设置加载chunk的脚本路径
 	function jsonpScriptSrc(chunkId) {
 		return __webpack_require__.p + "" + ({"foo":"foo"}[chunkId]||chunkId) + ".bundle.js"
   }
   
   // ...
 
-	// This file contains only the entry chunk.
-	// The chunk loading function for additional chunks
+	// 作用：懒加载代码块， 原理使用jsonp
 	__webpack_require__.e = function requireEnsure(chunkId) {
 		var promises = [];
 
-		// JSONP chunk loading for javascript
-
+    // 获取加载的chunk内容
 		var installedChunkData = installedChunks[chunkId];
-		if(installedChunkData !== 0) { // 0 means "already installed".
-
-			// a Promise means "currently loading".
+		if(installedChunkData !== 0) { // 0 表示已经加载过了
+			// Promise 意味着 chunk 正在加载
 			if(installedChunkData) {
 				promises.push(installedChunkData[2]);
 			} else {
-				// setup Promise in chunk cache
+        // 在chunk缓存中设置 Promise
 				var promise = new Promise(function(resolve, reject) {
 					installedChunkData = installedChunks[chunkId] = [resolve, reject];
 				});
 				promises.push(installedChunkData[2] = promise);
 
-				// start chunk loading
+				// 开始加载chunk，jsonp方式
 				var script = document.createElement('script');
 				var onScriptComplete;
 
-				script.charset = 'utf-8';
-				script.timeout = 120;
+				script.charset = 'utf-8'; // 设置字符集
+        script.timeout = 120;
+        // 和CSP相关
 				if (__webpack_require__.nc) {
 					script.setAttribute("nonce", __webpack_require__.nc);
 				}
 				script.src = jsonpScriptSrc(chunkId);
 
-				// create error before stack unwound to get useful stacktrace later
+				// 脚本加载完成、超时、出错的事件处理函数
 				var error = new Error();
 				onScriptComplete = function (event) {
-					// avoid mem leaks in IE.
+					// 避免IE内存泄漏
 					script.onerror = script.onload = null;
 					clearTimeout(timeout);
 					var chunk = installedChunks[chunkId];
@@ -142,7 +141,7 @@ import (/* webpackChunkName: "foo" */ './foo').then(foo => {
 						}
 						installedChunks[chunkId] = undefined;
 					}
-				};
+        };
 				var timeout = setTimeout(function(){
 					onScriptComplete({ type: 'timeout', target: script });
 				}, 120000);
@@ -155,24 +154,25 @@ import (/* webpackChunkName: "foo" */ './foo').then(foo => {
 
 	// ...
 
-	// on error function for async loading
+	// 异步加载时触发的错误函数
 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
-
-	var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
-	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
+  // 存储的是传入的chunk
+  var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
+  // 存储旧的 jsonpArray.push 方法
+  var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
+  // 将 webpackJsonpCallback 覆盖 jsonpArray.push 方法
 	jsonpArray.push = webpackJsonpCallback;
 	jsonpArray = jsonpArray.slice();
-	for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
+  for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
   var parentJsonpFunction = oldJsonpFunction;
-  
-	// Load entry module and return exports
+  // __webpack_require__.s 用于缓存入口模块id
 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
 })
 ({
   "./src/index.js":
   (function(module, exports, __webpack_require__) {
-
-    __webpack_require__.e(/*! import() | foo */ "foo").then(__webpack_require__.bind(null, /*! ./foo */ "./src/foo.js")).then(foo => {
+    // 异步加载 foo
+    __webpack_require__.e("foo").then(__webpack_require__.bind(null, "./src/foo.js")).then(foo => {
       console.log(foo)
     })
 
@@ -188,15 +188,16 @@ import (/* webpackChunkName: "foo" */ './foo').then(foo => {
   (function(module, __webpack_exports__, __webpack_require__) {
 
     "use strict";
+    // 将模块标识为 ES Module
     __webpack_require__.r(__webpack_exports__);
-
+    // 将代码块内容挂在 default 上
     __webpack_exports__["default"] = ('foo');
     
   })
 
 }]);
 ```
-先看`index.bundle.js`，
+
 
 ## 结语
 
