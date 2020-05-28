@@ -15,15 +15,20 @@
 看一下几个关键文件：
 
 - 依赖文件 `src/foo.js`
+
 ```javascript
 module.exports = 'foo';
 ```
+
 - 入口文件 `src/index.js`
+
 ```javascript
 const foo = require('./foo.js');
 console.log(foo)
 ```
+
 - webpack配置文件 `webpack.config.js`
+
 ```javascript
 const path = require('path');
 
@@ -330,5 +335,4 @@ dist/bundle.js
 
 webpack对于不同模块规范的相互加载的处理，我们已经有了基本的了解。但此时我们的文件加载都是同步的，那么文件的异步加载又是怎么样的呢？
 
-请听下回分解。
-[webpack 打包文件分析（下）](https://github.com/earlyBirdCamp/articles/issues/103)
+请听下回分解。[webpack 打包文件分析（下）](https://github.com/earlyBirdCamp/articles/issues/103)
