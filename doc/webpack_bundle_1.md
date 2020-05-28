@@ -239,7 +239,7 @@ jsonpArray = jsonpArray.slice();
 // 依次调用 webpackJsonpCallback
 for (var i = 0; i < jsonpArray.length; i++)
   webpackJsonpCallback(jsonpArray[i]);
-//
+// 缓存上一次的jsonpArray.push方法，形成链条，将模块共享挂载，起到缓存的作用。
 var parentJsonpFunction = oldJsonpFunction;
 ```
 这里用 `webpackJsonpCallback` 覆盖了 `window.webpackJson` 的 `push` 方法，也就是说，在 `foo.bundle.js` 中其实是调用了 `webpackJsonpCallback` 方法。
