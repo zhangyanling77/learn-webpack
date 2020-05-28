@@ -1,8 +1,8 @@
 # webpack 打包文件分析（上）
 
-## 前言
-
 ![webpack](https://github.com/zhangyanling77/learn-webpack/blob/master/webpack.png)
+
+## 前言
 
 `Webpack` 是一个用于静态资源打包的工具。它分析你的项目结构，会递归的构建依赖关系，找到其中脚本、图片、样式等将其转换和打包输出为浏览器能识别的资源。
 
@@ -331,3 +331,4 @@ dist/bundle.js
 webpack对于不同模块规范的相互加载的处理，我们已经有了基本的了解。但此时我们的文件加载都是同步的，那么文件的异步加载又是怎么样的呢？
 
 请听下回分解。
+[webpack 打包文件分析（下）](https://github.com/earlyBirdCamp/articles/issues/103)
