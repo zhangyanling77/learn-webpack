@@ -282,7 +282,63 @@ function webpackJsonpCallback(data) {
 - 然后，再把这些chunk都添加到 `modules` 对象中，这样就可通过 `modules[moduleId].call(module.exports, module, module.exports, __webpack_require__)` 来同步加载chunk，也就是 `foo.bundle.js` 中第一个 `then` 执行的内容，传入模块的路径，使用 `__webpack_require__` 进行同步加载。
 - 最后，依次执行收集的 `promise` 的 `resolve` 回调，将所有的 `promise` 变为完成态。
 
+到此，异步加载原理我们就有了一个基本的了解了。
+
+### 补充
+
+源码中还有部分的方法因为没有用到，所以没有做具体的分析。其中 `__webpack_require__.t` 这个方法很有必要提一下。
+
+这个方法会在异步加载中用到，比如，`foo.js` 是 CommonJS 规范的内容。
+
+```javascript
+module.exports = 'foo';
+```
+这个时候打包出来的入口文件中就可以看到 `__webpack_require__.t` 的身影。
+
+```javascript
+({
+
+  "./src/index.js":
+  (function(module, exports, __webpack_require__) {
+
+    __webpack_require__.e("foo").then(__webpack_require__.t.bind(null, "./src/foo.js", 7)).then(foo => {
+      console.log(foo)
+    })
+  })
+
+})
+```
+该方法传入模块的路径，以及一个数字 `7`，作用当然也是为了加载模块内容。但它和 `__webpack_require__` 相比究竟有什么区别呢？
+
+```javascript
+__webpack_require__.t = function(value, mode) {
+  if(mode & 1) value = __webpack_require__(value);
+  if(mode & 8) return value;
+  if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+  // 创建一个命名空间对象
+  var ns = Object.create(null);
+  // 将ns对象标识为 ES 模块
+  __webpack_require__.r(ns);
+  // 给ns对象定义default属性，值为传入的value
+  Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+  if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+  return ns;
+};
+```
+分析源码可以发现，该方法最终返回一个命名空间对象，接收的第二个参数是个数字，它接下来与 1，2，4，8 进行了按位与操作。想必你已经很快联想到了二进制吧，没错，这几个数字正是对应 0b0001，0b0010，0b0100，0b1000 这几个二进制数。为什么要用数字呢？当然是为了提高运算比较的效率。
+
+回到正题，该方法通过传入的第二个参数进行了以下处理。
+
+- 当 ` mode & 1` 为`true`，表示传入的`value`是一个模块id，需要使用 `__webpack_require__`来加载模块内容
+
+- 当 ` mode & 2` 为`true`，首先构造了一个 `ns` 的命名空间对象，将该对象传入 `__webpack_require__.r` 方法中，被标识为一个 ES Module （即拥有`__esModule`属性）。接着定义 `ns` 对象的 `default` 属性，并将传入的 `value` 挂上去作为该对象的值。然后遍历传入的 `value`，将它的属性和值都拷贝定义到 `ns` 上
+
+- 当 ` mode & 4` 为`true`，并且传入的 `value` 是个对象且拥有`__esModule`属性（表示已经是或者已经被包装为 ES Module了），则直接返回这个 `value` 对象
+
+- 当 ` mode & 8` 为`true`，其行为等同于 `require`，直接返回 `value` 即可
+
+
 
 ## 结语
 
-到此，异步加载原理我们就有了一个基本的了解了。简单总结一下，为了减少打包的体积，去掉非必要资源加载的浪费，我们需要异步加载方案来优化资源的加载。简单说，就是在需要用到某个文件的时候，通过 `import()` 引入这个文件，在返回的 `promise` 的 `then` 中去获取文件内容，以达到动态加载的目的。当然，这并不是唯一的方法，` webpack` 还提供了代码分割方案，也可以达到加载优化的效果。
+简单总结一下，为了减少打包的体积，去掉非必要资源加载的浪费，我们需要异步加载方案来优化资源的加载。简单说，就是在需要用到某个文件的时候，通过 `import()` 引入这个文件，在返回的 `promise` 的 `then` 中去获取文件内容，以达到动态加载的目的。当然，这并不是唯一的方法，` webpack` 还提供了代码分割方案，也可以达到加载优化的效果。
