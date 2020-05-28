@@ -1,5 +1,7 @@
 # webpack 打包文件分析（下）
 
+![webpack](https://github.com/zhangyanling77/learn-webpack/blob/master/webpack.png)
+
 ## 回顾
 
 上一篇我们讲到 `webpack` 打包源码中文件加载的部分，通过分析了解了在 `webpack` 中不同模块规范相互加载的处理。而至此，只包括了文件的**同步加载**分析，对于文件的异步加载又是如何处理的呢？
@@ -46,9 +48,9 @@ import(/* webpackChunkName: "foo" */ "./foo").then((foo) => {
 
 打包后输出两个文件：
 
-- `index.bundle.js`
+> `foo.bundle.js` 因为是异步加载的方式，单独打包为一个文件。由于打包后的源码内容过长，这里省略部分已经分析过的代码块。
 
-> `index.bundle.js` 中为同步加载的内容，而 `foo.bundle.js` 因为是异步加载的方式，单独打包为一个文件。由于打包后的源码内容过长，这里省略部分已经分析过的代码块。
+- `index.bundle.js`
 
 ```javascript
 (function (modules) {
@@ -240,7 +242,7 @@ for (var i = 0; i < jsonpArray.length; i++)
 //
 var parentJsonpFunction = oldJsonpFunction;
 ```
-这里用 `webpackJsonpCallback` 覆盖了 `window.webpackJson` 的 `push` 方法，也就是说，在 `foo.bundle.js` 中其实是调用了 `webpackJsonpCallback` 方法，将chunk传入，存储到 `window.webpackJson` 中。
+这里用 `webpackJsonpCallback` 覆盖了 `window.webpackJson` 的 `push` 方法，也就是说，在 `foo.bundle.js` 中其实是调用了 `webpackJsonpCallback` 方法。
 
 那么，这个 `webpackJsonpCallback` 方法究竟又做了什么呢？
 
@@ -276,10 +278,11 @@ function webpackJsonpCallback(data) {
 }
 ```
 根据代码内容分析，该方法
-- 首先看异步加载的chunk是否已经完成加载，如果还在加载中就收集所有 `promise` 的 `resolve`方法，接着在 `installedChunks` 对象中标记chunk为加载完成状态
-- 然后再把这些chunk都添加到 `modules` 对象中，这样就可通过 `modules[moduleId].call(module.exports, module, module.exports, __webpack_require__)` 来同步加载chunk，也就是 `foo.bundle.js` 中第一个 `then` 执行的内容，传入模块的路径，使用 `__webpack_require__` 进行同步加载。
+- 首先，判断异步加载的chunk是否已经完成加载，如果还在加载中就收集所有 `promise` 的 `resolve`方法，接着在 `installedChunks` 对象中标记chunk为加载完成状态
+- 然后，再把这些chunk都添加到 `modules` 对象中，这样就可通过 `modules[moduleId].call(module.exports, module, module.exports, __webpack_require__)` 来同步加载chunk，也就是 `foo.bundle.js` 中第一个 `then` 执行的内容，传入模块的路径，使用 `__webpack_require__` 进行同步加载。
 - 最后，依次执行收集的 `promise` 的 `resolve` 回调，将所有的 `promise` 变为完成态。
 
-到此，异步加载原理我们就有了一个基本的了解了。
 
 ## 结语
+
+到此，异步加载原理我们就有了一个基本的了解了。简单总结一下，为了减少打包的体积，去掉非必要资源加载的浪费，我们需要异步加载方案来优化资源的加载。简单说，就是在需要用到某个文件的时候，通过 `import()` 引入这个文件，在返回的 `promise` 的 `then` 中去获取文件内容，以达到动态加载的目的。当然，这并不是唯一的方法，` webpack` 还提供了代码分割方案，也可以达到加载优化的效果。
