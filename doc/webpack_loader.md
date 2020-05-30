@@ -73,3 +73,7 @@ module: {
 - loader 能够产生额外的任意文件。
 
 ## 如何编写一个loader
+
+loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 loader API，并通过 this 上下文访问。
+
+
