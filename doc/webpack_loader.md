@@ -17,7 +17,7 @@ npm install style-loader css-loader --save-dev
 ```javascript
 // ...
 module: {
-  rules: {
+  rules: [
     test: /\.css$/,
     use: [
       { loader: 'style-loader' },
@@ -28,7 +28,7 @@ module: {
         }
       }
     ]
-  }
+  ]
 }
 // ...
 ```
