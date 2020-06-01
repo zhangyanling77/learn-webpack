@@ -43,7 +43,7 @@ module: {
   可以在 `import` 语句中指定loader，使用 ! 将资源中的 loader 分开，分开的每个部分都相对于当前目录解析。
 
   ```javascript
-  import Styles 'style-loader!css-loader?modules!./styles.css';
+  import 'style-loader!css-loader?modules!./styles.css';
   ```
 
 - CLI 在shell命令中指定loader
@@ -57,6 +57,20 @@ module: {
 ## loader 特性
 
 - loader 支持链式传递。能够对资源使用流水线(pipeline)。**一组链式的 loader 将按照相反的顺序执行**。loader 链中的第一个 loader 返回值给下一个 loader。在最后一个 loader，返回 webpack 所预期的 JavaScript。
+
+```javascript
+// ...
+module: {
+  rules: [
+    {
+      test: /\.less$/,
+      use: ['style-loader', 'css-loader', 'less-loader']
+    }
+  ]
+}
+// ...
+```
+执行顺序则为：`less-loader` -> `css-loader` -> `style-loader`
 
 - loader 可以是同步的，也可以是异步的。
 
@@ -75,5 +89,3 @@ module: {
 ## 如何编写一个loader
 
 loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 loader API，并通过 this 上下文访问。
-
-
