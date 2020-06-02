@@ -58,19 +58,87 @@ module: {
 
 - loader 支持链式传递。能够对资源使用流水线(pipeline)。**一组链式的 loader 将按照相反的顺序执行**。loader 链中的第一个 loader 返回值给下一个 loader。在最后一个 loader，返回 webpack 所预期的 JavaScript。
 
+例如：
+
+`webpack.config.js`
+
 ```javascript
 // ...
 module: {
   rules: [
     {
-      test: /\.less$/,
-      use: ['style-loader', 'css-loader', 'less-loader']
+      test: /\.js$/,
+      use: ['loader1', 'loader2', 'loader3']
     }
   ]
 }
 // ...
 ```
-执行顺序则为：`less-loader` -> `css-loader` -> `style-loader`
+
+`loader1.js`
+
+```javascript
+function loader(source) {
+  console.log('loader1')
+  return source + '- loader1'
+}
+
+module.exports = loader
+```
+
+`loader2.js`
+
+```javascript
+function loader(source) {
+  console.log('loader2')
+  return source + '- loader2'
+}
+
+module.exports = loader
+```
+
+`loader3.js`
+
+```javascript
+function loader(source) {
+  console.log('loader3')
+  return source + '- loader3'
+}
+
+module.exports = loader
+```
+
+执行 `npm run build`，可以发现控制台打印了
+
+```bash
+// ...
+> webpack
+
+loader3
+loader2
+loader1
+Hash: e43a6d267093201ac10c
+Version: webpack 4.43.0
+// ...
+```
+最终输出的打包文件
+
+```javascript
+//...
+({
+  "./src/index.js":
+  (function(module, exports) {
+    // 这是index.js中的源码内容
+    var fn = function () {
+      // ...
+    }
+    // 经过所有的loader后添加的内容
+    -loader3-loader2-loader1
+  })
+})
+//...
+```
+可以看出 loader 的执行顺序确实是相反的（从右向左，从下往上）。
 
 - loader 可以是同步的，也可以是异步的。
 
