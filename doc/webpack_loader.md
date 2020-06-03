@@ -38,12 +38,14 @@ module: {
 
   这种即上面示例的方式，在 `module.rules` 中通过 `test` 属性标识出应该被对应loader进行转换的某个或某些文件，由 `use` 属性指定转换时使用哪个loader。
 
-- 内联：在每个 `import` 语句中显式指定loader
+- 内联：在每个 `import` 或者 `require` 语句中显式指定loader
 
   可以在 `import` 语句中指定loader，使用 ! 将资源中的 loader 分开，分开的每个部分都相对于当前目录解析。
 
   ```javascript
   import 'style-loader!css-loader?modules!./styles.css';
+  or
+  require('style-loader!css-loader?modules!./styles.css');
   ```
 
 - CLI 在shell命令中指定loader
