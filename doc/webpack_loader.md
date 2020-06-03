@@ -78,34 +78,34 @@ module: {
 `loader1.js`
 
 ```javascript
-function loader(source) {
+function loader1(source) { // 传入的文件源码内容 
   console.log('loader1')
   return source + '- loader1'
 }
 
-module.exports = loader
+module.exports = loader1
 ```
 
 `loader2.js`
 
 ```javascript
-function loader(source) {
+function loader2(source) { // 传入的文件源码内容- loader1
   console.log('loader2')
   return source + '- loader2'
 }
 
-module.exports = loader
+module.exports = loader2
 ```
 
 `loader3.js`
 
 ```javascript
-function loader(source) {
+function loader3(source) { // 传入的文件源码内容- loader1-loader2
   console.log('loader3')
   return source + '- loader3'
 }
 
-module.exports = loader
+module.exports = loader3
 ```
 
 执行 `npm run build`，可以发现控制台打印了
@@ -153,6 +153,31 @@ Version: webpack 4.43.0
 - 插件(plugin)可以为 loader 带来更多特性。
 
 - loader 能够产生额外的任意文件。
+
+通过（loader）预处理函数，loader 为 JavaScript 生态系统提供了更多能力。 用户现在可以更加灵活地引入细粒度逻辑，例如：压缩、打包、语言翻译和 [更多其他特性](https://webpack.docschina.org/loaders)。
+
+## loader runner
+
+### loader类型
+
+- 前置 pre
+
+- 普通 normal
+
+- 内联 inline
+
+- 后置 post
+
+loader 的叠加顺序：post + inline + normal + pre
+
+### 特殊配置
+
+符号 | 变量 | 含义
+:-|:-|:-
+-! | noPreAutoLoaders | 不执行前置和普通loader
+! | noAutoLoaders | 不执行普通loader
+!! | noPrePostAutoLoaders | 不执行前置、后置及普通loader
+
 
 ## 如何编写一个loader
 
