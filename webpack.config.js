@@ -17,26 +17,35 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   mode: 'development', // 标识不同的环境，development 开发 | production 生产
   devtool: 'none', // 不生成 sourcemap 文件
-  entry: './src/main.js', // 文件入口
+  // entry: './src/index.js', // 文件入口
+  entry: './ast/4.tree-shaking.js',
   output:  {
     path: path.resolve(__dirname, 'dist'), // 输出目录
-    filename: '[name].bundle.js', // 输出文件名称
+    // filename: '[name].bundle.js', // 输出文件名称
+    filename: 'bundle.js'
   },
   // 告诉webpack如何解析loader路径
-  resolveLoader: {
-    alias: {
-      'babel-loader': path.resolve(__dirname, 'loaders', 'babel-loader')
-    },
-    modules: [
-      path.resolve(__dirname, 'loaders'), "node_modules"
-    ]
-  },
+  // resolveLoader: {
+  //   alias: {
+  //     'babel-loader': path.resolve(__dirname, 'loaders', 'babel-loader')
+  //   },
+  //   modules: [
+  //     path.resolve(__dirname, 'loaders'), "node_modules"
+  //   ]
+  // },
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: [
-          'loader1', 'loader2', 'loader3'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            // 按需加载lodash 使用 babel-plugin-import.js 自己来实现一下
+            plugins: [['import', { library: 'lodash' }]]
+          }
+        }
+        // use: [
+          // 'loader1', 'loader2', 'loader3'
           // {
           //   loader: 'babel-loader',
           //   options: {
@@ -46,7 +55,7 @@ module.exports = {
           //     ]
           //   }
           // }
-        ]
+        // ]
       }
     ]
   },
