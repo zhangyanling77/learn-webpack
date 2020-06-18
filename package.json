@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/zhangyanling77/learn-webpack#readme",
   "devDependencies": {
+    "@types/jszip": "^3.4.1",
+    "jszip": "^3.5.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
@@ -29,6 +31,7 @@
     "@types/escodegen": "0.0.6",
     "@types/esprima": "^4.0.2",
     "@types/estraverse": "0.0.6",
+    "@types/jquery": "^3.3.38",
     "@types/lodash": "^4.14.155",
     "babel-loader": "^8.1.0",
     "babel-types": "^6.26.0",
@@ -37,6 +40,7 @@
     "esprima": "^4.0.1",
     "estraverse": "^5.1.0",
     "html-webpack-plugin": "^4.3.0",
+    "jquery": "^3.5.1",
     "lodash": "^4.17.15"
   }
 }
